@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RefreshTokenStore } from '../../modules/auth/refresh-token.store';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
@@ -22,6 +23,10 @@ export class RefreshTokenGuard implements CanActivate {
       throw new UnauthorizedException('Missing refresh token');
     }
 
+    if (!RefreshTokenStore.has(token)) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.config.get<string>('auth.jwtRefreshSecret'),
@@ -32,6 +37,7 @@ export class RefreshTokenGuard implements CanActivate {
         roles: payload.roles,
       };
 
+      request.refreshToken = token;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid refresh token');

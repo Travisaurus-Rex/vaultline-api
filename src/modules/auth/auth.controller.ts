@@ -1,4 +1,4 @@
-import { Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { Role } from 'src/common/constants/roles';
 import { User } from 'src/common/decorators/user.decorator';
 import { RefreshTokenGuard } from 'src/common/guards/refresh-token.guard';
@@ -23,5 +23,11 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   refresh(@User() user: User) {
     return this.authService.issueTokens(user);
+  }
+
+  @Post('logout')
+  logout(@Body('refreshToken') token: string) {
+    this.authService.logout(token);
+    return { message: 'logged out' };
   }
 }

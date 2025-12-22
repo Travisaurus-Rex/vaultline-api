@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { Role } from '../../common/constants/roles';
+import { RefreshTokenStore } from './refresh-token.store';
 
 @Injectable()
 export class AuthService {
@@ -25,6 +26,21 @@ export class AuthService {
       expiresIn: '7d',
     });
 
+    RefreshTokenStore.add(refreshToken);
+
     return { accessToken, refreshToken };
+  }
+
+  rotateRefreshToken(oldToken: string, user: { id: string; roles: Role[] }) {
+    if (!RefreshTokenStore.has(oldToken)) {
+      throw new UnauthorizedException('Refresh token revoked');
+    }
+
+    RefreshTokenStore.remove(oldToken);
+    return this.issueTokens(user);
+  }
+
+  logout(refreshToken: string) {
+    RefreshTokenStore.remove(refreshToken);
   }
 }
