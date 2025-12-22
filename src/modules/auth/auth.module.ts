@@ -10,9 +10,6 @@ import { ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get<string>('auth.jwtAccessSecret'),
-        signOptions: {
-          expiresIn: '15m',
-        },
       }),
     }),
   ],
