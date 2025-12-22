@@ -4,26 +4,34 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Role } from '../constants/roles';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/modules/auth/types/jwt-payload';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
+  constructor(private jwtService: JwtService) {}
 
-    // temp
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
     const authHeader = request.headers['authorization'];
 
-    if (!authHeader) {
-      throw new UnauthorizedException('Missing authorization header');
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Missing bearer token');
     }
 
-    // placeholder
-    request.user = {
-      id: 'stud-user-id',
-      role: [Role.USER],
-    };
+    const token = authHeader.replace('Bearer ', '').trim();
 
-    return true;
+    try {
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
+
+      request.user = {
+        id: payload.sub,
+        role: payload.roles,
+      };
+
+      return true;
+    } catch {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 }
