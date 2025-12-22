@@ -5,6 +5,7 @@ import { configuration } from './config';
 import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     }),
     HealthModule,
     AuthModule,
+    UsersModule,
   ],
 })
 export class AppModule {}
