@@ -10,7 +10,7 @@ import { Role } from '../constants/roles';
 export class ApiKeyGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const authHeader = request.headers['authorization'];
+    const authHeader = request.headers['x-api-key'];
 
     if (!authHeader || !authHeader.startsWith('ApiKey ')) {
       throw new UnauthorizedException('Missing API key');
