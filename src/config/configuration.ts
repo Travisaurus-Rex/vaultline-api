@@ -7,7 +7,7 @@ export const configuration = () => ({
     url: process.env.DATABASE_URL,
   },
   auth: {
-    jwtAccessSecret: process.env.JWT_ACESS_SECRET,
+    jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
     jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
   },
 });
