@@ -5,6 +5,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/constants/roles';
 import { OwnershipGuard } from 'src/common/guards/ownership.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,7 +25,7 @@ export class UsersController {
 
   @Put(':id')
   @UseGuards(OwnershipGuard)
-  updateUser(@Param('id') id: string, @Body() body: any) {
+  updateUser(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.usersService.update(id, body);
   }
 }
