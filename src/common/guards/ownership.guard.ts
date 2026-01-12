@@ -8,19 +8,16 @@ import {
 @Injectable()
 export class OwnershipGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const req = context.switchToHttp().getRequest();
+    const userId = req.user?.id;
+    const ownerId = req.params?.id;
 
-    if (!user || !user.id) {
-      throw new ForbiddenException('Missing authenticated user');
+    if (!userId || !ownerId) {
+      throw new ForbiddenException('Ownership cannot be determined');
     }
 
-    // temp
-    const ownerId =
-      request.params?.userId || request.body?.userId || request.resourceOwnerId;
-
-    if (!ownerId) {
-      throw new ForbiddenException('User does not own this resource');
+    if (userId !== ownerId) {
+      throw new ForbiddenException('You do not own this resource');
     }
 
     return true;
