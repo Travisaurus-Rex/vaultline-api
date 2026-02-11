@@ -3,21 +3,22 @@ import {
   ExecutionContext,
   Injectable,
   ForbiddenException,
+  UnauthorizedException,
 } from '@nestjs/common';
 
 @Injectable()
 export class OwnershipGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest();
-    const userId = req.user?.id;
-    const ownerId = req.params?.id;
+    const resourceOwnerID = req.user?.id;
+    const authenticatedUser = req.user;
 
-    if (!userId || !ownerId) {
-      throw new ForbiddenException('Ownership cannot be determined');
+    if (!authenticatedUser?.id) {
+      throw new UnauthorizedException('User not authenticated');
     }
 
-    if (userId !== ownerId) {
-      throw new ForbiddenException('You do not own this resource');
+    if (resourceOwnerID !== authenticatedUser.id) {
+      throw new ForbiddenException('Cannot access this resource');
     }
 
     return true;
